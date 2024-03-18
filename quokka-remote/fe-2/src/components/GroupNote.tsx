@@ -1,0 +1,79 @@
+import copy from 'copy-to-clipboard';
+import { Label } from './ui/label';
+import { Switch } from './ui/switch';
+import { useState } from 'react';
+import { useToast } from './ui/use-toast';
+import { useMutation } from '@tanstack/react-query';
+import { request } from '~/lib/request';
+import Link from 'next/link';
+
+export const GroupNote = (props: any) => {
+    const { toast } = useToast()
+    const [state, setState] = useState(props.card || {}) as any
+    const card = state || {}
+
+    const mutation = useMutation({
+        mutationFn: (card: any) => {
+            return request.patch('/groups-note', { ...card }).then(res => {
+            })
+        }, onSuccess: () => {
+            toast({
+                variant: "default",
+                title: "Update successful.",
+            })
+        }
+    })
+
+    return (
+        <div key={card.id} className="max-w-sm p-4 rounded overflow-hidden shadow-lg m-2">
+            <div className="py-4 rounded-lg flex justify-between space-x-10 items-center">
+                <div className="font-bold text-xl mb-2">{card.group_name} <span className="text-xs font-light">( {card.notesCount} )</span></div>
+                <Link href={`groups/${card.id}`} className='cursor-pointer'>
+                    <svg className="h-8 w-8 text-gray-500" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z" />  <line x1="5" y1="12" x2="19" y2="12" />  <line x1="15" y1="16" x2="19" y2="12" />  <line x1="15" y1="8" x2="19" y2="12" /></svg>
+                </Link>
+            </div>
+            <div className="space-x-10 flex">
+                <div className="flex items-center space-x-2">
+                    <Switch
+                        checked={card.is_public}
+                        onCheckedChange={(e) => {
+                            const val = { ...card, is_public: e }
+                            setState(val)
+                            mutation.mutate(val)
+                        }}
+                    />
+                    <Label htmlFor="airplane-mode">Is Public</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+
+                    <Switch
+                        checked={card.is_deleted}
+                        onCheckedChange={(e) => {
+                            const val = { ...card, is_deleted: e }
+                            setState(val)
+                            mutation.mutate(val)
+                        }}
+                    />
+                    <Label htmlFor="airplane-mode">Is Delete</Label>
+                </div>
+            </div>
+            <div className="space-x-10 flex items-center">
+                <div className="pt-4">
+                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{`#${card.type}`}</span>
+                </div>
+                {
+                    card.is_public && (<div className="px-6 pt-4 pb-2 flex items-center cursor-pointer" onClick={() => {
+                        copy(`${process.env['NEXT_PUBLIC_BASE_URL_FE']}/share/${card.link_share}`);
+                        toast({
+                            variant: "default",
+                            title: "Copied",
+                        })
+                    }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        <span className="text-xs">Copy link</span>
+                    </div>)
+                }
+            </div>
+        </div>
+    )
+}
