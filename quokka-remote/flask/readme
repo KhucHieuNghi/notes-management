@@ -13,10 +13,12 @@
 #Required: Python > 3.8, NodeJS > 18
 
 #fe-2 listen default port 3000
+- eslint formatter codebase
 ```
     yarn dev
 ```
 #flask listen default port 5000
+- pylint formatter codebase
 ```
     sh setup.sh
     sh run.sh
