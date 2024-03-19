@@ -12,11 +12,20 @@ import { getCookie, getCookies } from "cookies-next";
 import { Toaster } from "~/components/ui/toaster";
 import { useRouter } from "next/router";
 import { CodeSandboxLogoIcon } from "@radix-ui/react-icons";
+import moment from "moment-timezone";
+
+moment.tz.setDefault("Asia/Ho_Chi_Minh");
 
 function globalReducer(state: any, action: any) {
   switch (action.type) {
     case "setUser": {
       return { ...state, user: action.value };
+    }
+    case "setUsers": {
+      return { ...state, users: action.value };
+    }
+    case "setUserNames": {
+      return { ...state, usernames: action.value };
     }
     default: {
       throw Error("Unknown action: " + action.type);
@@ -27,11 +36,38 @@ const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   const route = useRouter();
-  const isRoutesRequiredLogin = ["/groups", "/notes"].includes(route.route);
+
+  const isRoutesRequiredLogin = [
+    "/groups",
+    "/notes",
+    "/groups/[id]",
+    "/notes/[id]",
+  ].includes(route.route);
 
   const [global, dispatch] = useReducer(globalReducer, {
     user: undefined,
+    users: [],
+    usernames: {}
   });
+
+  const getUsers = () => {
+    return request
+    .get("/users")
+    .catch(() => {
+    })
+    .then((res: any) => {
+      console.log(res);
+      const users = res?.data?.data;
+      dispatch({ type: "setUsers", value: users });
+
+      const usernames = Object.values(users).reduce((result:any, user:any) => {
+        result[user?.id] = user.username
+        return result
+      }, {})
+
+      dispatch({ type: "setUserNames", value: usernames });
+    });
+  }
 
   const getMe = () => {
     const token = getCookie(
@@ -46,8 +82,10 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         })
         .then((res: any) => {
-          console.log(res);
           dispatch({ type: "setUser", value: res?.data });
+          if(res?.data.role === 'ADMIN'){
+            getUsers()
+          }
         });
     }
   };
@@ -56,25 +94,16 @@ export default function App({ Component, pageProps }: AppProps) {
     getMe();
   }, []);
 
-  // const { isPending, error, data } = useQuery({
-  //   queryKey: ['repoData'],
-  //   queryFn: () => request.get('/me')
-  // })
-  // console.log('isPending', isPending, data, error)
-
   return (
-    <GlobalContext.Provider value={[global, dispatch]}>
+    <GlobalContext.Provider value={[global, dispatch, queryClient]}>
       <QueryClientProvider client={queryClient}>
-        {/* {isRoutesRequiredLogin && !global.user ? (
+        {isRoutesRequiredLogin && !global.user ? (
           "...Loading..."
         ) : (
           <Component {...pageProps} />
-        )} */}
-        <Component {...pageProps} />
+        )}
         <Toaster />
       </QueryClientProvider>
     </GlobalContext.Provider>
   );
-
-  // return <GlobalContext.Provider value={[global, dispatch]}><Component {...pageProps} /></GlobalContext.Provider>;
 }

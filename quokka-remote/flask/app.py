@@ -7,11 +7,11 @@ from utils.common import decodeJWT
 app = Flask('KHN_QUOKKA')
 dotenv_path = join(dirname(__file__), '.env')  # Path to .env file
 load_dotenv(dotenv_path)
+CORS(app)
 
 from hooks.database import *;
 from route import *
 
-CORS(app)
 app.RES = RES;
 @app.before_request
 def middlewareIsAuthentication():

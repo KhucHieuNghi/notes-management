@@ -1,0 +1,39 @@
+--- Deployment
+#Local deployment
+```
+    docker compose up -d
+```
+
+#Prod deployment
+```
+    docker stack deploy
+```
+
+--- Development
+#Required: Python > 3.8, NodeJS > 18
+
+#fe-2 listen default port 3000
+```
+    yarn dev
+```
+#flask listen default port 5000
+```
+    sh setup.sh
+    sh run.sh
+```
+
+--- Features
+- Authentication for ADMIN
+- OAuth2 for CLIENT
+- CRUD Group Notes
+- CRUD Notes
+- Share link Group Notes
+-- ThirdParties: Firebase, WorkOS
+
+-- Stacks
+- BE: Flask API base on Python@3.9
+- FE: NextJS base on NodeJS
+- Database: Mongodb insteadof DynamoDB (The current account is not convenient to set up dynamo for the project, sorry for the inconvenience)
+
+
+

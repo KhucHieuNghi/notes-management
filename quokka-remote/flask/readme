@@ -1,0 +1,53 @@
+--- Deployment
+#Local deployment
+```
+    docker compose up -d
+```
+
+#Prod deployment
+```
+    docker stack deploy
+```
+
+--- Development
+#Required: Python > 3.8, NodeJS > 18
+
+#fe-2 listen default port 3000
+```
+    yarn dev
+```
+#flask listen default port 5000
+```
+    sh setup.sh
+    sh run.sh
+```
+
+--- Features
+- Authentication for ADMIN
+- OAuth2 for CLIENT
+- CRUD Group Notes
+- CRUD Notes
+- Share link Group Notes
+
+-- ThirdParties: Firebase, WorkOS
+
+1. As a user I can save a short note (username + note + timestamp) on dynamodb
+database.
+2. As a user I can see a list of notes from all users.
+3. As a user I can see filter notes by username.
+
+4. Deliverables
+By the stated deadline you should deliver the following:
+1. The entire source code (including resources) of your solution
+a. Source code must be your own (except where otherwise indicated in your
+comments)
+b. You should use a CI (ex: serverless or terraform) to deploy the code.
+2. A “readme” overview of your solution that documents
+a. A brief outline of your approach
+b. Documents for those apis (postman for example)
+c. How much time you spent on which aspects of the application
+d. Any known issues or limitations of the solution.
+3. Distribution
+a. You can commit your code to a public GitHub repo or any other distribution
+service as long as you can give us an appropriate access
+(tam.phan@quokkapps.com.au)

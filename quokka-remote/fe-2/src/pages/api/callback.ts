@@ -19,6 +19,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const userResult = { ...userResponse, work_id: id };
 
+  console.log('userResult', userResult)
+
   const tokenRes = await axios.post(
     `${process.env["NEXT_PUBLIC_BASE_URL"]}/oauth2-callback`,
     userResult,

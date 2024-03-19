@@ -1,5 +1,3 @@
-import Image from "next/image";
-import Link from "next/link";
 import { Button } from "~/components/ui/button";
 
 import { useQuery } from "@tanstack/react-query";
@@ -7,24 +5,9 @@ import { useContext, useState } from "react";
 import { CreateGroup } from "~/components/CreateGroup";
 import { GroupNote } from "~/components/GroupNote";
 import Menu from "~/components/Menu";
-import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import { request } from "~/lib/request";
-import { GlobalContext } from "~/lib/utils";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -35,12 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { GlobalContext } from "~/lib/utils";
 
 export default function Groups() {
   const [filterType, setFilterType] = useState<any>({
     key: "",
     value: "",
   });
+
+  const [global] = useContext(GlobalContext) as any;
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["groups-note"],
@@ -50,12 +36,19 @@ export default function Groups() {
   const cards =
     filterType.key && filterType.value
       ? (data?.data?.data || []).filter((item: any) => {
-          if (filterType.key === "is_public")
-            return item[filterType.key] === true;
 
-          return item[filterType.key].includes(filterType.value);
+        const itemF = {...item, update_by: global?.usernames?.[item?.update_by] || item?.update_by || '' }
+
+          if (filterType.key === "is_public")
+            return itemF[filterType.key] === true;
+
+          return itemF[filterType.key].includes(filterType.value);
         })
       : data?.data?.data || [];
+
+  const cardsResult = cards.map((card:any) => {
+    return {...card, update_by: global?.usernames?.[card?.update_by] || card?.update_by || '' }
+  })
 
   return (
     <main className="flex min-h-screen flex-col p-24">
@@ -110,7 +103,7 @@ export default function Groups() {
           )}
           <Button
             className="ml-4"
-            variant="destructive"
+            variant="outline"
             onClick={() => setFilterType({ key: "", value: undefined })}
           >
             Remove
@@ -119,9 +112,9 @@ export default function Groups() {
         {isLoading ? (
           "...Loading..."
         ) : (
-          <div className="flex flex-wrap justify-center">
-            {cards.map((card: any, index: any) => (
-              <GroupNote key={index} card={card}></GroupNote>
+          <div className="flex flex-wrap justify-start">
+            {cardsResult.map((card: any, index: any) => (
+              <GroupNote key={card.id + index} card={card}></GroupNote>
             ))}
           </div>
         )}

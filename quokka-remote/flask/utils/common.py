@@ -2,7 +2,7 @@ from flask import request
 from functools import wraps
 import os
 import jwt
-def getRoleByUser(request): 
+def getRoleByUser(request):
     isAdmin = request.user['role'] == 'ADMIN'
     return isAdmin, request.user;
 
@@ -29,3 +29,18 @@ def decodeJWT(jwt_encode):
     except Exception as err:
         print('err', err)
         return False, {}
+
+def getFullname(user):
+    fullname = ''
+    last_name = user.get('lastName')
+    first_name = user.get('firstName')
+
+    if last_name is not None:
+        fullname += last_name
+
+    if first_name is not None:
+        if fullname:
+            fullname += ' '
+
+    fullname += first_name if first_name is not None else ''
+    return fullname

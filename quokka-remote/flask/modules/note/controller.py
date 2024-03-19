@@ -1,4 +1,5 @@
 from modules.note.service import *;
+from modules.group.service import *;
 from utils.common import getRoleByUser
 from utils.common import validateFields
 from utils.formatter import formatJson
@@ -12,16 +13,29 @@ def getNotesController():
 
     keySearch = request.args.get('keySearch', None);
     valSearch = request.args.get('valSearch', None);
-    
+
     if isAdmin:
         notes = getNotesServiceByAdmin(keySearch, valSearch);
     else:
         notes = getNotesServiceByUser(user, keySearch, valSearch);
-    
+
     for item in notes:
             data.append(formatJson(item))
 
     return app.RES(data);
+
+def getNoteByIdController(id):
+    isAdmin, user = getRoleByUser(request)
+
+    if isAdmin:
+        note = getNoteByIdService(id);
+    else:
+        note = getNoteByIdService(id);
+
+        if user['tenant_id'] != note.tenant_id:
+            return app.RES(message="You are not the owner of this note", status=400);
+
+    return app.RES(note);
 
 def createNoteController(body):
 
@@ -64,30 +78,11 @@ def updateNoteController(body):
 
     return app.RES(note);
 
-def getGroupNotesController():
-
-    isAdmin, user = getRoleByUser(request)
-
-    data = []
-    if isAdmin:
-        notes = getGroupNoteServiceByAdmin();
-    else:
-        notes = getGroupNoteServiceByUser(user);
-
-    for item in notes:
-        val = json.loads(item.model_dump_json())
-        val['notesCount'] = len(getNotesServiceByGroup(str(item.id), None));
-        data.append(val)
-
-    print(data)
-
-    return app.RES(data);
-
 def getNoteByGroupController(group_id):
 
     isAdmin, user = getRoleByUser(request)
 
-    if isAdmin: return app.RES(message = "Can not get note by group with role admin", status=400) 
+    if isAdmin: return app.RES(message = "Can not get note by group with role admin", status=400)
 
     groupNote = getGroupNoteById(group_id)
 
@@ -96,53 +91,16 @@ def getNoteByGroupController(group_id):
 
     if user['tenant_id'] != dict(groupNote)['tenant_id']:
         return app.RES(message="You are not the owner of this group", status=400);
-    
+
     data = []
     notes = getNotesServiceByGroup(group_id, False);
+
+    print(notes, groupNote)
 
     for item in notes:
         data.append(formatJson(item))
 
-    return app.RES(data);
-
-def createGroupNoteController(body):
-
-    isAdmin, user = getRoleByUser(request)
-
-    if isAdmin: return app.RES(message = "Can not create group note by role admin", status=400) 
-
-    isValid = validateFields(['group_name'], body)
-
-    if not isValid:
-        return app.RES(message="Miss some fields", status=400);
-
-    groupNote = createGroupNoteService(user, body);
-
-    return app.RES(groupNote);
-
-def updateGroupNoteController(body):
-
-    isAdmin, user = getRoleByUser(request)
-
-    if isAdmin: return app.RES(message = "Can not update group note by role admin", status=400) 
-
-    isValid = validateFields(['id', 'group_name', 'tenant_id', 'is_public'], body)
-
-    if not isValid:
-        return app.RES(message="Miss some fields", status=400);
-
-    groupNoteOriginal = getGroupNoteById(body['id'])
-
-    if not bool(groupNoteOriginal): return app.RES(message="Not found group note", status=404);
-
-    groupNoteOriginal = dict(groupNoteOriginal);
-
-    if user['tenant_id'] != groupNoteOriginal['tenant_id']:
-        return app.RES(message="You are not the owner of this group", status=400);
-
-    groupNote = updateGroupNoteService(user, groupNoteOriginal, body);
-
-    return app.RES(groupNote);
+    return {"group": formatJson(groupNote), "notes": data}, 200
 
 def getNoteByGroupToShareController(link_id):
 
@@ -153,9 +111,9 @@ def getNoteByGroupToShareController(link_id):
 
     if not bool(groupNote.is_public):
         return app.RES(message="Notes not public", status=403);
-    
+
     data = []
-    notes = getNotesServiceByGroup(dict(groupNote).get('group_id'), False);
+    notes = getNotesServiceByGroup(dict(groupNote).get('id'), False);
 
     for item in notes:
         data.append(formatJson(item))

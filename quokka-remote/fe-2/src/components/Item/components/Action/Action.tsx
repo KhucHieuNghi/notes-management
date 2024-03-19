@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { forwardRef, CSSProperties } from "react";
 import classNames from "classnames";
 

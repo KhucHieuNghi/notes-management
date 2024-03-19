@@ -14,7 +14,7 @@ const Menu = () => {
 
   return (
     <>
-      <EditProfile></EditProfile>
+      {Boolean(state.user) && <EditProfile></EditProfile>}
       <Menubar value={route.route}>
         <MenubarMenu value="/groups">
           <MenubarTrigger>

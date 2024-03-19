@@ -6,6 +6,7 @@ import { useToast } from "./ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { request } from "~/lib/request";
 import Link from "next/link";
+import moment from "moment";
 
 export const GroupNote = (props: any) => {
   const { toast } = useToast();
@@ -14,13 +15,20 @@ export const GroupNote = (props: any) => {
 
   const mutation = useMutation({
     mutationFn: (card: any) => {
-      return request.patch("/groups-note", { ...card }).then((res) => {});
-    },
-    onSuccess: () => {
-      toast({
-        variant: "default",
-        title: "Update successful.",
-      });
+      return request
+        .patch("/groups-note", { ...card })
+        .then((res) => {
+          toast({
+            variant: "default",
+            title: "Update successful.",
+          });
+        })
+        .catch((err) => {
+          toast({
+            variant: "default",
+            title: `Error: ${err?.response?.data?.message}`,
+          });
+        });
     },
   });
 
@@ -32,7 +40,9 @@ export const GroupNote = (props: any) => {
       <div className="flex items-center justify-between space-x-10 rounded-lg py-4">
         <div className="mb-2 text-xl font-bold">
           {card.group_name}{" "}
-          <span className="text-xs font-light">( {card.notesCount} )</span>
+          <span className="text-xs font-light">
+            ( {card.notesCount} ) notes
+          </span>
         </div>
         <Link href={`groups/${card.id}`} className="cursor-pointer">
           <svg
@@ -83,9 +93,12 @@ export const GroupNote = (props: any) => {
           <span className="mb-2 mr-2 inline-block rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700">{`#${card.type}`}</span>
           <span className="inline-block rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700">{`By:${card.update_by.slice(0, 5)}`}</span>
         </div>
+      </div>{" "}
+      <div className="flex items-center justify-between">
+        <span className="inline-block rounded-full px-3 py-1 text-sm font-semibold text-gray-700">{`CreateAt: ${moment(card.create_at).add(7, "hour").fromNow()}`}</span>
         {card.is_public && (
           <div
-            className="flex w-[150px] cursor-pointer items-center px-6 pb-2 pt-4"
+            className="flex w-[150px] cursor-pointer items-center"
             onClick={() => {
               copy(
                 `${process.env["NEXT_PUBLIC_BASE_URL_FE"]}/share/${card.link_share}`,

@@ -32,6 +32,7 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 
 const formSchema = z.object({
   fullname: z.string().min(2).max(50),
+  username: z.string().min(3).max(128),
 });
 
 export function EditProfile() {
@@ -43,20 +44,37 @@ export function EditProfile() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullname: state.user.fullname,
+      username: state.user.username,
+    },
+  });
+
+  const mutationVerifyAccount = useMutation({
+    mutationFn: (username: any) => {
+      return request.post("/verify-account", { username });
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const newUser = { ...state.user, fullname: values.fullname };
+    try {
+      const newUser = { ...state.user, fullname: values.fullname, username: values.username };
 
-    dispatch({ type: "setUser", value: newUser });
+      await mutationVerifyAccount.mutateAsync(values.username)
+      
+      dispatch({ type: "setUser", value: newUser });
 
-    await mutation.mutateAsync(newUser);
+      await mutation.mutateAsync(newUser);
 
-    toast({
-      variant: "default",
-      title: "Upload successful.",
-    });
+      toast({
+        variant: "default",
+        title: "Upload successful.",
+      });
+    } catch (error:any) {
+      form.setError('username', {message: error?.response?.data?.message})
+      toast({
+        variant: "default",
+        title: `Error: ${error?.response?.data?.message || ''}.`,
+      });
+    }
   };
 
   const mutation = useMutation({
@@ -69,6 +87,7 @@ export function EditProfile() {
       });
     },
   });
+
 
   const onUpload = async (e: any) => {
     const { url } = (await upload(e.target.files[0])) as any;
@@ -148,6 +167,22 @@ export function EditProfile() {
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
                         <Input placeholder="quokka" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        This is your public display name.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>User Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="username" {...field} />
                       </FormControl>
                       <FormDescription>
                         This is your public display name.
