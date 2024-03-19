@@ -7,17 +7,20 @@ import { useContext } from "react";
 import { GlobalContext } from "~/lib/utils";
 
 export default function Home() {
-  const [state, dispath] = useContext(GlobalContext) as any
-  console.log("🚀 ~ Home ~ state:", state)
+  const [state, dispath] = useContext(GlobalContext) as any;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        {
-          state.user ? <Menu /> : <Button asChild>
-          <Button onClick={() => window.location.href = '/api/auth'}>Login</Button>
-        </Button>
-        }
+        {state.user ? (
+          <Menu />
+        ) : (
+          <Button asChild>
+            <Button onClick={() => (window.location.href = "/api/auth")}>
+              Login
+            </Button>
+          </Button>
+        )}
         <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white lg:static lg:h-auto lg:w-auto lg:bg-none dark:from-black dark:via-black">
           <a
             className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
@@ -41,8 +44,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-      </div>
+      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left"></div>
     </main>
   );
 }

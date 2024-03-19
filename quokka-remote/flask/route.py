@@ -17,9 +17,9 @@ def signup():
 
     return {}, 400
 
-@app.route('/verify-account', methods=['POST'])
-def verifyAccount():
-    return verifyAccountController(request.json)
+@app.route('/signin', methods=['POST'])
+def signin():
+    return signInController(request.json)
 
 @app.route('/me', methods=['GET', 'POST', 'PATCH'])
 def getMe():
@@ -38,6 +38,10 @@ def getMe():
         
     return {}, 400
 
+@app.route('/verify-account', methods=['POST'])
+def verifyAccount():
+    return verifyAccountController(request.json)
+    
 @app.route('/oauth2-callback', methods=['POST'])
 def oAuth2CallBack():
     return OAuth2CallbackController(request.json)

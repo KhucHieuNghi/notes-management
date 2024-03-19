@@ -22,10 +22,7 @@ def signUpBasicController(user):
             return app.RES(message="Invalid User Name length", status=400);
     
         if user['password'] != user['confirmPassword']:
-            return app.RES(message="Password does not match", status=400);
-    
-        if len(user['username']) < 3 or len(user['username']) > 20:
-            return app.RES(message="Invalid username length", status=400);
+            return app.RES(message="Confirm Password and Password does not match", status=400);
 
         if len(user['password']) < 8 or len(user['password']) > 128:
             return app.RES(message="Invalid password length", status=400);
@@ -36,6 +33,7 @@ def signUpBasicController(user):
         if 'email' in user and verifyExistedEmail(user['email']):
             return app.RES(message="Email already exists", status=400);
         
+        user['role'] = "ADMIN"
         result = createUserService(user);
 
         return app.RES(result)
@@ -68,13 +66,10 @@ def signInController(user):
 
         result.password = None;
 
-        encoded_jwt = jwt.encode(user, os.environ['JWT_SECRET_KEY'], algorithm=os.environ['JWT_SECRET_ALGO'])
-        
-        res = make_response(json.dumps(formatJson(result)), 200)
-        
-        res.set_cookie(os.environ['JWT_SECRET_TOKEN_NAME'], encoded_jwt)
+        encoded_jwt = jwt.encode(formatJson(result), os.environ['JWT_SECRET_KEY'], algorithm=os.environ['JWT_SECRET_ALGO'])
 
-        return res;
+        return {"user": formatJson(result), "token": encoded_jwt}, 200;
+    
     except Exception as err:
         app.logger.exception(err)
         return app.RES(None, str(err), 400)

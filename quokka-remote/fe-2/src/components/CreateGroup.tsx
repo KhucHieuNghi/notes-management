@@ -11,69 +11,81 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { request } from "~/lib/request";
 import { useImage } from "~/lib/useImage";
 import { GlobalContext } from "~/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { useToast } from "./ui/use-toast";
-import { Switch } from "./ui/switch";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { Switch } from "./ui/switch";
+import { useToast } from "./ui/use-toast";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 const formSchema = z.object({
   group_name: z.string().min(2).max(50),
   type: z.string(),
   is_public: z.boolean(),
   is_deleted: z.boolean(),
-})
+});
 
 export function CreateGroup(props: any) {
-  const [open, setOpen] = useState(false)
-  const [state, dispatch] = useContext(GlobalContext) as any
-  const { toast } = useToast()
+  const [open, setOpen] = useState(false);
+  const [state, dispatch] = useContext(GlobalContext) as any;
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      group_name: '',
-      type: 'basic',
+      group_name: "",
+      type: "basic",
       is_public: false,
-      is_deleted: false
+      is_deleted: false,
     },
-  })
+  });
 
   const mutation = useMutation({
     mutationFn: (group: any) => {
-      return request.post('groups-note', {...group})
+      return request.post("groups-note", { ...group });
     },
     onSuccess: () => {
-      props.refetch()
-    }
-  })
+      props.refetch();
+    },
+  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await mutation.mutateAsync(values);
+      setOpen(false);
 
-    await mutation.mutate(values)
-    setOpen(false)
-
-    toast({
-      variant: "default",
-      title: "Create successful.",
-    })
-
-  }
+      toast({
+        variant: "default",
+        title: "Create successful.",
+      });
+    } catch (e: any) {
+      console.log(e);
+      toast({
+        variant: "default",
+        title: `Error: ${e?.response?.data?.message}`,
+      });
+    }
+  };
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button>
-            Create Group
-          </Button>
-
+          <Button>Create Group</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -81,7 +93,10 @@ export function CreateGroup(props: any) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
                 <FormField
                   control={form.control}
                   name="group_name"
@@ -133,21 +148,17 @@ export function CreateGroup(props: any) {
                             <FormControl>
                               <RadioGroupItem value="basic" />
                             </FormControl>
-                            <FormLabel className="font-normal">
-                              Basic
-                            </FormLabel>
+                            <FormLabel className="font-normal">Basic</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl>
                               <RadioGroupItem value="draw" />
                             </FormControl>
-                            <FormLabel className="font-normal">
-                              Draw
-                            </FormLabel>
+                            <FormLabel className="font-normal">Draw</FormLabel>
                           </FormItem>
                           <FormItem className="flex items-center space-x-3 space-y-0">
                             <FormControl>
-                              <RadioGroupItem value="list" />
+                              <RadioGroupItem disabled value="list" />
                             </FormControl>
                             <FormLabel className="font-normal">List</FormLabel>
                           </FormItem>
@@ -157,7 +168,12 @@ export function CreateGroup(props: any) {
                     </FormItem>
                   )}
                 />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" disabled={mutation.isPending}>
+                  {mutation.isPending && (
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Submit
+                </Button>
               </form>
             </Form>
           </div>

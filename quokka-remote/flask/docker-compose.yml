@@ -10,3 +10,31 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: quokka
       MONGO_INITDB_ROOT_PASSWORD: quokka
+
+  be:
+    image: flask
+    restart: always
+    env_file:
+    - path: ./.env
+    ports:
+      - 5000:5000
+    environment:
+      PRIMARY_DATABASE_HOST: mongo
+      PRIMARY_DATABASE_PORT: 27017
+      PRIMARY_DATABASE_USERNAME: quokka
+      MONGO_INITDB_ROOT_PASSWORD: quokka
+      PRIMARY_DATABASE_DATABASE: quokka
+
+      # FLASK_ENV=development
+
+      # PRIMARY_DATABASE_HOST = "localhost"
+      # PRIMARY_DATABASE_PORT = 27017
+      # PRIMARY_DATABASE_USERNAME = "quokka"
+      # PRIMARY_DATABASE_PASSWORD = "quokka"
+      # PRIMARY_DATABASE_DATABASE = "quokka"
+
+      # JWT_SECRET_KEY = "quokka_quokka_quokka_quokka_quokka"
+      # JWT_SECRET_ALGO = "HS256"
+      # JWT_SECRET_TOKEN_NAME = "quokka_token"
+
+      # HOST_CLIENT = "http://localhost:3000"
