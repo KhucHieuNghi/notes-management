@@ -1,7 +1,6 @@
-version: '3.1'
+version: "3.1"
 
 services:
-
   mongo:
     image: mongo
     restart: always
@@ -10,35 +9,61 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: quokka
       MONGO_INITDB_ROOT_PASSWORD: quokka
-
-  # be:
-  #   image: flask
-  #   build:
-  #     context: backend
-  #     dockerfile: ./flask/Dockerfile
-  #   env_file:
-  #   - path: ./.env
-  #   ports:
-  #     - 5000:5000
-  #   deploy:
-  #   restart_policy:
-  #     condition: on-failure
-  #     delay: 5s
-  #     max_attempts: 3
-  #     window: 120s
-  #   resources:
-  #     limits:
-  #       cpus: '0.50'
-  #       memory: 252M
-  #     reservations:
-  #       cpus: '0.25'
-  #       memory: 252M
-  #   environment:
-  #     PRIMARY_DATABASE_HOST: mongo
-  #     PRIMARY_DATABASE_PORT: 27017
-  #     PRIMARY_DATABASE_USERNAME: quokka
-  #     MONGO_INITDB_ROOT_PASSWORD: quokka
-  #     PRIMARY_DATABASE_DATABASE: quokka
-  # fe:
-  #   image: next
-  #   build: ./webapp
+  be:
+    image: flask
+    build: ./flask
+    env_file: ./.env
+    ports:
+      - 5000:5000
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 252M
+        reservations:
+          cpus: "0.25"
+          memory: 252M
+    environment:
+      PRIMARY_DATABASE_HOST: mongo
+      PRIMARY_DATABASE_PORT: 27017
+      PRIMARY_DATABASE_USERNAME: quokka
+      PRIMARY_DATABASE_PASSWORD: quokka
+      PRIMARY_DATABASE_DATABASE: quokka
+      JWT_SECRET_KEY: quokka_quokka_quokka_quokka_quokka
+      JWT_SECRET_ALGO: HS256
+      JWT_SECRET_TOKEN_NAME: quokka_token
+  fe:
+    image: next
+    build: ./fe-2
+    # env_file: ./.env
+    ports:
+      - 3000:3000
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 252M
+        reservations:
+          cpus: "0.25"
+          memory: 252M
+    environment:
+      NEXT_PUBLIC_BASE_URL: http://be:5000
+      NEXT_PUBLIC_BASE_URL_FE: http://localhost:3000
+      JWT_SECRET_KEY: "quokka_quokka_quokka_quokka_quokka"
+      JWT_SECRET_ALGO: "HS256"
+      JWT_SECRET_TOKEN_NAME: "quokka_token"
+      NEXT_PUBLIC_JWT_SECRET_TOKEN_NAME: "quokka_token"
+      # NEXT_PUBLIC_BASE_URL = "http://127.0.0.1:5000"
+      # NEXT_PUBLIC_BASE_URL_FE = "http://localhost:3000"
+      WORKOS_API_KEY: "sk_test_a2V5XzAxSEdYM0pOUDQxVEJEUVlDODA2S1JLNzRRLFo3MTVaYUhydTlQa2JiQ0pRWVlXVDVzaEs"
+      WORKOS_CLIENT_ID: "client_01HGX3JP6R5F8TRPN3ZHXZWFBW"

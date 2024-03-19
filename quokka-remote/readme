@@ -28,12 +28,32 @@
 - CRUD Group Notes
 - CRUD Notes
 - Share link Group Notes
+
 -- ThirdParties: Firebase, WorkOS
 
--- Stacks
-- BE: Flask API base on Python@3.9
-- FE: NextJS base on NodeJS
-- Database: Mongodb insteadof DynamoDB (The current account is not convenient to set up dynamo for the project, sorry for the inconvenience)
+[Done] Requirement
+1. As a user I can save a short note (username + note + timestamp) on dynamodb
+database.
+2. As a user I can see a list of notes from all users.
+3. As a user I can see filter notes by username.
 
+4. Deliverables
+b. You should use a CI (ex: serverless or terraform) to deploy the code.
+> I usually use cdk more instead of hcl
 
+2. A “readme” overview of your solution that documents
+> readme file, I wish to ask directly
 
+a. A brief outline of your approach
+b. Documents for those apis (postman for example)
+> Miss api fetch endpoind
+
+c. How much time you spent on which aspects of the application
+> total: 4d*8 = 32h mind full
+
+d. Any known issues or limitations of the solution.
+> Can only serve mvp, the system is quite loose and lacks correlation mappings at the backend layer
+
+a. You can commit your code to a public GitHub repo or any other distribution
+service as long as you can give us an appropriate access
+(tam.phan@quokkapps.com.au)

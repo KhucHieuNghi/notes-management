@@ -4,10 +4,9 @@ FROM python:3.8-slim-buster
 
 WORKDIR /python-docker
 
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-
 COPY . .
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt && pip3 install pyjwt && pip install pyjwt
 
 EXPOSE 5000
 
