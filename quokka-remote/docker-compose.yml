@@ -38,8 +38,8 @@ services:
       JWT_SECRET_ALGO: HS256
       JWT_SECRET_TOKEN_NAME: quokka_token
   fe:
-    image: next
-    build: ./fe-2
+    image: fe
+    build: ./fe
     # env_file: ./.env
     ports:
       - 3000:3000
@@ -63,7 +63,5 @@ services:
       JWT_SECRET_ALGO: "HS256"
       JWT_SECRET_TOKEN_NAME: "quokka_token"
       NEXT_PUBLIC_JWT_SECRET_TOKEN_NAME: "quokka_token"
-      # NEXT_PUBLIC_BASE_URL = "http://127.0.0.1:5000"
-      # NEXT_PUBLIC_BASE_URL_FE = "http://localhost:3000"
       WORKOS_API_KEY: "sk_test_a2V5XzAxSEdYM0pOUDQxVEJEUVlDODA2S1JLNzRRLFo3MTVaYUhydTlQa2JiQ0pRWVlXVDVzaEs"
       WORKOS_CLIENT_ID: "client_01HGX3JP6R5F8TRPN3ZHXZWFBW"

@@ -8,7 +8,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import { request } from "~/lib/request";
-import { getCookie, getCookies } from "cookies-next";
+import { getCookie, getCookies, setCookie } from "cookies-next";
 import { Toaster } from "~/components/ui/toaster";
 import { useRouter } from "next/router";
 import { CodeSandboxLogoIcon } from "@radix-ui/react-icons";
@@ -77,6 +77,7 @@ export default function App({ Component, pageProps }: AppProps) {
       request
         .post("/me", { token })
         .catch(() => {
+          setCookie(process.env["NEXT_PUBLIC_JWT_SECRET_TOKEN_NAME"] as any,  '')
           if (isRoutesRequiredLogin) {
             route.push("/");
           }

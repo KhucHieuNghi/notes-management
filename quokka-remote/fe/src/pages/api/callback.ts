@@ -19,12 +19,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const userResult = { ...userResponse, work_id: id };
 
-  console.log('userResult', userResult)
+  console.log('userResult', userResult, code)
 
   const tokenRes = await axios.post(
     `${process.env["NEXT_PUBLIC_BASE_URL"]}/oauth2-callback`,
     userResult,
   );
+
+  console.log('tokenRes', tokenRes)
 
   setCookie(
     process.env["NEXT_PUBLIC_JWT_SECRET_TOKEN_NAME"] as any,

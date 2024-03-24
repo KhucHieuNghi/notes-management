@@ -10,16 +10,24 @@
 ```
 
 --- Development
-#Required: Python > 3.8, NodeJS > 18
+#Required: Python > 3.8, NodeJS > 18, make (gcc, cc)
+
+#How to run
+```
+    cd flask
+    make setup
+    make start
+```
 
 #fe-2 listen default port 3000
 ```
-    yarn dev
+    cd ./fe && yarn dev
 ```
 #flask listen default port 5000
 ```
-    sh setup.sh
-    sh run.sh
+    cd flask \
+    && make setup \
+    && make start
 ```
 
 --- Features
